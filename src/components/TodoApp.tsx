@@ -1,64 +1,58 @@
 import AddTodo from "./AddTodo";
+import TodoItem from "./TodoItem";
+import { useState } from "react";
 
-type TodoItem = {
-    id: number,
-    description: string
-    done: boolean
-}
+type Todo = {
+  id: number;
+  description: string;
+  checked: boolean;
+};
 
 export function TodoApp() {
-    return (
-        <>
-        <div className="flex">
-         
-         <AddTodo />
-        </div>
-            
-            <div className="my-5 flex-column gap-5 w-full text-left">
-                {/* TODO ITEM version normal */}
-                <div className="bg-indigo-300 w-full m-5 rounded-box p-3 flex">
-                    <span className="pr-8">
-                        <input type="checkbox" className="checkbox" />
-                    </span>
-                    <span className="flex-grow">
-                        Acheter des oranges
-                    </span>
-                    <div>
-                        <button className="btn btn-error btn-outline btn-xs">
-                            X
-                        </button>
-                    </div>
-                </div>
+    const [todos, setTodos] = useState<Todo[]>([
 
-                {/* TODO Item version cochée */}
-                <div className="bg-indigo-700 w-full m-5 rounded-box p-3 flex">
-                    <span className="pr-8">
-                        <input type="checkbox"  className="checkbox" />
-                    </span>
-                    <span className="flex-grow line-through">
-                        Courir avec le fraté
-                    </span>
-                    <div>
-                        <button className="btn btn-error btn-outline btn-xs">
-                            X
-                        </button>
-                    </div>
-                </div>
+      ]);
+    const addTodo = (description: string) => {
+        const newId = todos.length > 0 ? Math.max(...todos.map(todo => todo.id)) + 1 : 1;
 
-                <div className="bg-indigo-700 w-full m-5 rounded-box p-3 flex">
-                    <span className="pr-8">
-                        <input type="checkbox"  className="checkbox" />
-                    </span>
-                    <span className="flex-grow line-through">
-                        Me faire défoncer à LoL ce jeu de merde
-                    </span>
-                    <div>
-                        <button className="btn btn-error btn-outline btn-xs">
-                            X
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </>
-    )
+        const newTodo: Todo = {
+          id: newId,
+          description: description,
+          checked: false,
+          
+        };
+    setTodos([...todos, newTodo]);
+    };
+    const removeTodo = (id: number) => {
+        const updatedTodos = todos.filter(todo => todo.id !== id); 
+        setTodos(updatedTodos);
+      };
+    const toggleChecked = (id: number) => {
+        const updatedTodos = todos.map(todo =>
+          todo.id === id ? { ...todo, checked: !todo.checked } : todo
+        );
+        setTodos(updatedTodos);
+      };
+      
+  return (
+    <>
+      <div className="flex">
+        <AddTodo onAddTodo={addTodo} />
+      </div>
+
+      <div className="my-5 flex-column gap-5 w-full text-left">
+    
+        {todos.map((todo) => (
+          <TodoItem
+            key={todo.id}
+            id={todo.id}
+            description={todo.description}
+            checked={todo.checked}
+            onRemove={removeTodo}
+            onToggleChecked={toggleChecked}
+          />
+        ))}
+      </div>
+    </>
+  );
 }
